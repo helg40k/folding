@@ -1,43 +1,44 @@
 package net.helg40k.controller;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by helg40k on 9/22/15.
  */
 @Controller
+@RequestMapping
 public class BaseController {
 
-    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(BaseController.class);
+    private final static Logger logger = LoggerFactory.getLogger(BaseController.class);
 
-    private static int counter = 0;
-    private static final String VIEW_INDEX = "index";
-
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String welcome(ModelMap model) {
-
-        model.addAttribute("message", "Welcome");
-        model.addAttribute("counter", ++counter);
-        logger.debug("[welcome] counter : {}", counter);
-
-        // Spring uses InternalResourceViewResolver and return back index.jsp
-        return VIEW_INDEX;
-
+    @RequestMapping("/index")
+    public String getIndexPage() {
+        return "index";
     }
 
-    @RequestMapping(value = "/{name}", method = RequestMethod.GET)
-    public String welcomeName(@PathVariable String name, ModelMap model) {
+    @RequestMapping(value = "/children", method = RequestMethod.GET)
+    public @ResponseBody List<String> welcomeName() {
 
-        model.addAttribute("message", "Welcome " + name);
-        model.addAttribute("counter", ++counter);
-        logger.debug("[welcomeName] counter : {}", counter);
-        return VIEW_INDEX;
+        File file = new File(".");
+        File[] children = file.listFiles();
+        List<String> fileNames = null;
+        if (null != children) {
+            fileNames = new ArrayList<>(children.length);
+            for (File child : children) {
+                fileNames.add(child.getAbsolutePath());
+            }
+        }
 
+        return fileNames;
     }
 
 }
